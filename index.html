@@ -758,6 +758,7 @@ tr:hover td { background: rgba(0, 217, 192, 0.03); }
             <div class="header-subtitle">Weekly Marketing Tracker &mdash; Q2 2026</div>
         </div>
         <div style="display:flex; align-items:center; gap:var(--space-md);">
+            <span style="font-size:11px;color:var(--text-tertiary);" id="data-source-indicator"></span>
             <span class="save-indicator" id="save-indicator">Saved</span>
             <div class="week-selector">
                 <label for="week-select">Week:</label>
@@ -911,6 +912,27 @@ tr:hover td { background: rgba(0, 217, 192, 0.03); }
             <div class="section-title">
                 <svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--teal)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 <span>Settings</span>
+            </div>
+
+            <div class="settings-group">
+                <label for="gsheet-url">Google Sheet URL — Weekly Data (Published CSV)</label>
+                <input type="url" id="gsheet-url" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=0&single=true&output=csv">
+                <div class="help-text">
+                    In your Google Sheet: File > Share > Publish to web > select "Weekly Data" sheet > CSV format > Publish. Paste the URL here. This is how the dashboard reads Shalini's data — everyone sees the same numbers.
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <label for="gsheet-meetings-url">Google Sheet URL — Meetings (Published CSV)</label>
+                <input type="url" id="gsheet-meetings-url" placeholder="https://docs.google.com/spreadsheets/d/.../pub?gid=...&single=true&output=csv">
+                <div class="help-text">
+                    Same process but select the "Meetings" sheet instead. This populates the Booked Meetings tab.
+                </div>
+            </div>
+
+            <div style="margin-bottom:var(--space-lg); display:flex; gap:var(--space-sm);">
+                <button class="btn-primary btn-sm" onclick="refreshFromSheet()">Refresh Data from Sheet Now</button>
+                <span class="fetch-status" id="sheet-fetch-status"></span>
             </div>
 
             <div class="settings-group">
@@ -1102,11 +1124,11 @@ function checkTargetStreak(data, key, streakLen) {
 }
 
 /* ============================================================
-   DATA PERSISTENCE (localStorage)
+   DATA PERSISTENCE — Google Sheets + localStorage fallback
    ============================================================ */
 const STORAGE_KEY = 'zavmo_tracker_q2_2026';
 
-function loadData() {
+function loadLocalData() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) return JSON.parse(raw);
@@ -1121,7 +1143,97 @@ function saveData(data) {
     setTimeout(() => el.classList.remove('visible'), 2000);
 }
 
-let weeklyData = loadData();
+// Parse CSV text into array of objects using row 1 as keys
+function parseCSV(csvText) {
+    const lines = csvText.trim().split('\n');
+    if (lines.length < 2) return [];
+    const keys = lines[0].split(',').map(k => k.trim().replace(/^"|"$/g, ''));
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+        const vals = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+        const obj = {};
+        keys.forEach((k, j) => { obj[k] = vals[j] || ''; });
+        rows.push(obj);
+    }
+    return rows;
+}
+
+// Fetch data from published Google Sheet CSV
+async function fetchGoogleSheetData() {
+    const settings = loadSettings();
+    const url = settings.gsheetUrl;
+    if (!url) return null;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return null;
+        const csv = await response.text();
+        const rows = parseCSV(csv);
+
+        // Convert to our weeklyData format (array of 12 objects)
+        const data = Array.from({ length: WEEKS }, () => ({}));
+        rows.forEach(row => {
+            const weekNum = parseInt(row.week);
+            if (weekNum >= 1 && weekNum <= WEEKS) {
+                const idx = weekNum - 1;
+                METRICS.forEach(m => {
+                    if (row[m.key] !== undefined && row[m.key] !== '') {
+                        data[idx][m.key] = parseFloat(row[m.key]);
+                    }
+                });
+            }
+        });
+        return data;
+    } catch (err) {
+        console.warn('Failed to fetch Google Sheet:', err);
+        return null;
+    }
+}
+
+// Fetch meetings from published Google Sheet CSV
+async function fetchGoogleSheetMeetings() {
+    const settings = loadSettings();
+    const url = settings.gsheetMeetingsUrl;
+    if (!url) return null;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return null;
+        const csv = await response.text();
+        const rows = parseCSV(csv);
+
+        return rows.filter(r => r.date && r.company).map((r, i) => ({
+            id: Date.now() + i,
+            date: r.date || '',
+            company: r.company || '',
+            contact: r.contact || '',
+            bookedBy: r.booked_by || '',
+            status: r.status || 'scheduled',
+            notes: r.notes || '',
+            source: 'google-sheet'
+        }));
+    } catch (err) {
+        console.warn('Failed to fetch meetings sheet:', err);
+        return null;
+    }
+}
+
+// Load data: try Google Sheet first, fall back to localStorage
+async function loadData() {
+    const sheetData = await fetchGoogleSheetData();
+    if (sheetData) {
+        weeklyData = sheetData;
+        saveData(sheetData); // cache locally
+        const el = document.getElementById('data-source-indicator');
+        if (el) el.textContent = 'Live from Google Sheet';
+        return;
+    }
+    weeklyData = loadLocalData();
+    const el = document.getElementById('data-source-indicator');
+    if (el) el.textContent = 'Local data (no sheet connected)';
+}
+
+let weeklyData = loadLocalData(); // initial sync load
 let currentWeek = 0;
 let previousAchievements = new Set();
 
@@ -1651,7 +1763,7 @@ function loadSettings() {
         const raw = localStorage.getItem(SETTINGS_KEY);
         if (raw) return JSON.parse(raw);
     } catch(e) {}
-    return { webhookUrl: '', dashboardUrl: 'https://iridescent-technologies.github.io/Marketing/', notifyEnabled: false, ga4Property: '', ga4Enabled: false, calSearch: 'demo, zavmo, discovery', calEnabled: false };
+    return { webhookUrl: '', dashboardUrl: 'https://iridescent-technologies.github.io/Marketing/', notifyEnabled: false, ga4Property: '', ga4Enabled: false, calSearch: 'demo, zavmo, discovery', calEnabled: false, gsheetUrl: '', gsheetMeetingsUrl: '' };
 }
 
 function renderSettings() {
@@ -1660,6 +1772,8 @@ function renderSettings() {
     document.getElementById('dashboard-url').value = settings.dashboardUrl || '';
     document.getElementById('ga4-property').value = settings.ga4Property || '';
     document.getElementById('cal-search').value = settings.calSearch || 'demo, zavmo, discovery';
+    document.getElementById('gsheet-url').value = settings.gsheetUrl || '';
+    document.getElementById('gsheet-meetings-url').value = settings.gsheetMeetingsUrl || '';
 
     const toggles = {
         'notify-toggle': settings.notifyEnabled,
@@ -1717,12 +1831,48 @@ function saveSettings() {
         ga4Property: document.getElementById('ga4-property').value.trim(),
         ga4Enabled: document.getElementById('ga4-toggle').classList.contains('active'),
         calSearch: document.getElementById('cal-search').value.trim(),
-        calEnabled: document.getElementById('cal-toggle').classList.contains('active')
+        calEnabled: document.getElementById('cal-toggle').classList.contains('active'),
+        gsheetUrl: document.getElementById('gsheet-url').value.trim(),
+        gsheetMeetingsUrl: document.getElementById('gsheet-meetings-url').value.trim()
     };
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     updateWebhookStatus(settings.webhookUrl);
     renderSettings();
     showToast('Settings Saved', 'All integration preferences updated');
+}
+
+async function refreshFromSheet() {
+    const statusEl = document.getElementById('sheet-fetch-status');
+    const settings = loadSettings();
+    if (!settings.gsheetUrl) {
+        if (statusEl) statusEl.innerHTML = '<span style="color:var(--danger)">No Google Sheet URL configured — add one above and save first</span>';
+        return;
+    }
+    if (statusEl) statusEl.innerHTML = '<span style="color:var(--text-secondary)">Fetching...</span>';
+    try {
+        const sheetData = await fetchGoogleSheetData();
+        if (sheetData) {
+            weeklyData = sheetData;
+            saveData(sheetData);
+            renderAll();
+            const indicator = document.getElementById('data-source-indicator');
+            if (indicator) indicator.textContent = 'Live from Google Sheet';
+            if (statusEl) statusEl.innerHTML = '<span style="color:var(--teal)">Data refreshed successfully</span>';
+            showToast('Sheet Synced', 'Weekly data loaded from Google Sheet');
+        } else {
+            if (statusEl) statusEl.innerHTML = '<span style="color:var(--danger)">No data returned — check the URL is a published CSV</span>';
+        }
+        // Also fetch meetings if configured
+        if (settings.gsheetMeetingsUrl) {
+            const meetingsData = await fetchGoogleSheetMeetings();
+            if (meetingsData) {
+                localStorage.setItem('zavmo_meetings', JSON.stringify(meetingsData));
+                renderMeetings();
+            }
+        }
+    } catch (err) {
+        if (statusEl) statusEl.innerHTML = '<span style="color:var(--danger)">Error: ' + err.message + '</span>';
+    }
 }
 
 function buildNotificationPayload(weekIndex, newAchievements) {
@@ -2060,10 +2210,15 @@ async function fetchCalendarMeetings() {
     }
 }
 
-// Initial render
-renderAll();
+// Initial render — try Google Sheet first, fall back to local
 renderSettings();
 renderMeetings();
+renderAll();
+(async () => {
+    await loadData();
+    renderAll();
+    renderMeetings();
+})();
 </script>
 </body>
 </html>
