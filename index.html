@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZAVMO Marketing Tracker — Q2 2026</title>
+<style>
+/* ============================================================
+   ZAVMO BRAND VARIABLES
+   ============================================================ */
+:root {
+    --bg-primary: #0a1628;
+    --bg-secondary: #0d1e36;
+    --bg-card: rgba(13, 30, 54, 0.6);
+    --teal: #00d9c0;
+    --teal-glow: #00ffeb;
+    --teal-dim: rgba(0, 217, 192, 0.15);
+    --text-primary: #ffffff;
+    --text-secondary: #b8c5d6;
+    --text-tertiary: #6b7c93;
+    --border-subtle: rgba(26, 58, 92, 0.5);
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --gold: #ffd700;
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Inter", sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ============================================================
+   AURORA BACKGROUND
+   ============================================================ */
+.aurora-container {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+.aurora-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.08;
+}
+.aurora-blob:nth-child(1) {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, var(--teal-glow), transparent 70%);
+    top: -200px; left: -100px;
+    animation: auroraFloat1 25s ease-in-out infinite;
+}
+.aurora-blob:nth-child(2) {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, var(--teal), transparent 70%);
+    bottom: -100px; right: -50px;
+    animation: auroraFloat2 30s ease-in-out infinite;
+}
+.aurora-blob:nth-child(3) {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, var(--teal-glow), transparent 70%);
+    top: 50%; left: 50%;
+    animation: auroraFloat3 20s ease-in-out infinite;
+}
+@keyframes auroraFloat1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(80px,60px)} }
+@keyframes auroraFloat2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-60px,-80px)} }
+@keyframes auroraFloat3 { 0%,100%{transform:translate(-50%,-50%)} 50%{transform:translate(-30%,-30%)} }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.app { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: var(--space-lg); }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+.logo {
+    font-size: 24px;
+    font-weight: 300;
+    letter-spacing: 6px;
+    color: var(--text-primary);
+    text-transform: uppercase;
+}
+.logo span { color: var(--teal); }
+.header-subtitle {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    font-weight: 400;
+}
+.week-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+.week-selector label {
+    font-size: 13px;
+    color: var(--text-tertiary);
+}
+.week-selector select {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+}
+.week-selector select:focus { border-color: var(--teal); }
+
+/* ============================================================
+   NAVIGATION TABS
+   ============================================================ */
+.tabs {
+    display: flex;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-xl);
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0;
+    overflow-x: auto;
+}
+.tab {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    font-family: inherit;
+}
+.tab:hover { color: var(--text-secondary); }
+.tab.active {
+    color: var(--teal);
+    border-bottom-color: var(--teal);
+}
+
+/* ============================================================
+   GLASS CARD
+   ============================================================ */
+.glass-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: var(--space-lg);
+    transition: all 0.4s ease;
+}
+.glass-card:hover {
+    border-color: rgba(0, 217, 192, 0.2);
+}
+
+/* ============================================================
+   KPI CARDS
+   ============================================================ */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+.kpi-card {
+    text-align: center;
+    padding: var(--space-lg);
+    position: relative;
+    overflow: hidden;
+}
+.kpi-card.primary {
+    border-color: rgba(0, 217, 192, 0.4);
+    background: rgba(0, 217, 192, 0.05);
+}
+.kpi-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-sm);
+}
+.kpi-value {
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.1;
+}
+.kpi-card.primary .kpi-value { color: var(--teal); }
+.kpi-target {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: var(--space-xs);
+}
+.kpi-bar {
+    margin-top: var(--space-sm);
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.kpi-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.8s ease;
+}
+.kpi-bar-fill.on-track { background: var(--teal); }
+.kpi-bar-fill.close { background: var(--warning); }
+.kpi-bar-fill.behind { background: var(--danger); }
+
+/* ============================================================
+   SECTION PANEL
+   ============================================================ */
+.section { margin-bottom: var(--space-xl); display: none; }
+.section.active { display: block; }
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+.section-title svg { width: 20px; height: 20px; stroke: var(--teal); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ============================================================
+   DATA ENTRY FORM
+   ============================================================ */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-md);
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+.form-group label {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+.form-row .target-badge {
+    font-size: 11px;
+    color: var(--teal);
+    background: var(--teal-dim);
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+.form-group input {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.3s ease;
+    width: 100%;
+}
+.form-group input:focus { border-color: var(--teal); }
+.form-group input::placeholder { color: var(--text-tertiary); }
+
+.form-section-label {
+    grid-column: 1 / -1;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border-subtle);
+    margin-top: var(--space-sm);
+}
+
+.form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: var(--space-md);
+    padding-top: var(--space-md);
+}
+.btn-primary {
+    background: var(--teal);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+.btn-primary:hover {
+    background: var(--teal-glow);
+    box-shadow: 0 0 20px rgba(0, 217, 192, 0.4);
+}
+.btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+.btn-secondary:hover { border-color: var(--teal); color: var(--teal); }
+
+/* ============================================================
+   CHARTS
+   ============================================================ */
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+@media (max-width: 600px) { .chart-grid { grid-template-columns: 1fr; } }
+.chart-card { padding: var(--space-lg); }
+.chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-md);
+}
+.chart-container {
+    position: relative;
+    height: 220px;
+}
+canvas { width: 100% !important; }
+
+/* ============================================================
+   ACHIEVEMENTS
+   ============================================================ */
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-md);
+}
+.achievement-card {
+    text-align: center;
+    padding: var(--space-lg);
+    position: relative;
+    transition: all 0.4s ease;
+}
+.achievement-card.locked { opacity: 0.35; filter: grayscale(1); }
+.achievement-card.unlocked {
+    border-color: rgba(0, 217, 192, 0.4);
+    animation: achieveGlow 2s ease-in-out infinite alternate;
+}
+@keyframes achieveGlow {
+    0% { box-shadow: 0 0 10px rgba(0, 217, 192, 0.05); }
+    100% { box-shadow: 0 0 25px rgba(0, 217, 192, 0.15); }
+}
+.achievement-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto var(--space-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--teal-dim);
+}
+.achievement-card.unlocked .achievement-icon {
+    background: rgba(0, 217, 192, 0.2);
+}
+.achievement-icon svg { width: 24px; height: 24px; stroke: var(--teal); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.achievement-card.locked .achievement-icon svg { stroke: var(--text-tertiary); }
+.achievement-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+.achievement-card.locked .achievement-name { color: var(--text-tertiary); }
+.achievement-desc {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    line-height: 1.5;
+}
+.achievement-week {
+    font-size: 10px;
+    color: var(--teal);
+    margin-top: var(--space-xs);
+}
+
+/* ============================================================
+   TABLE VIEW
+   ============================================================ */
+.table-wrapper { overflow-x: auto; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-tertiary);
+    border-bottom: 1px solid var(--border-subtle);
+    white-space: nowrap;
+}
+td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(26, 58, 92, 0.2);
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+tr:hover td { background: rgba(0, 217, 192, 0.03); }
+.var-positive { color: var(--success); }
+.var-negative { color: var(--danger); }
+.var-zero { color: var(--text-tertiary); }
+
+/* ============================================================
+   CONFETTI CANVAS
+   ============================================================ */
+#confetti-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+/* ============================================================
+   TOAST NOTIFICATIONS
+   ============================================================ */
+.toast-container {
+    position: fixed;
+    top: var(--space-lg);
+    right: var(--space-lg);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+.toast {
+    background: var(--bg-secondary);
+    border: 1px solid rgba(0, 217, 192, 0.4);
+    border-radius: 12px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    animation: toastIn 0.4s ease, toastOut 0.4s ease 3.6s forwards;
+    backdrop-filter: blur(20px);
+    max-width: 360px;
+    box-shadow: 0 10px 40px rgba(0, 217, 192, 0.15);
+}
+.toast-icon { font-size: 20px; flex-shrink: 0; }
+.toast-text {
+    font-size: 13px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+@keyframes toastIn { 0%{transform:translateX(120%);opacity:0} 100%{transform:translateX(0);opacity:1} }
+@keyframes toastOut { 0%{transform:translateX(0);opacity:1} 100%{transform:translateX(120%);opacity:0} }
+
+/* ============================================================
+   SAVE INDICATOR
+   ============================================================ */
+.save-indicator {
+    font-size: 12px;
+    color: var(--teal);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 4px 12px;
+    background: var(--teal-dim);
+    border-radius: 6px;
+}
+.save-indicator.visible { opacity: 1; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    .app { padding: var(--space-md); }
+    .header { flex-direction: column; align-items: flex-start; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+    .kpi-value { font-size: 28px; }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================================
+   EXPORT SECTION
+   ============================================================ */
+.export-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+/* ============================================================
+   SETTINGS PANEL
+   ============================================================ */
+.settings-group {
+    margin-bottom: var(--space-lg);
+}
+.settings-group label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-xs);
+}
+.settings-group input[type="text"],
+.settings-group input[type="url"] {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+.settings-group input:focus { border-color: var(--teal); }
+.settings-group .help-text {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: var(--space-xs);
+    line-height: 1.5;
+}
+.settings-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-top: var(--space-sm);
+}
+.settings-status.connected { background: rgba(52,211,153,0.15); color: var(--success); }
+.settings-status.disconnected { background: rgba(248,113,113,0.15); color: var(--danger); }
+.notification-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+}
+.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+.toggle-switch.active { background: var(--teal); }
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+.toggle-switch.active::after { transform: translateX(20px); }
+
+/* ============================================================
+   MEETINGS TAB
+   ============================================================ */
+.meeting-entry {
+    display: grid;
+    grid-template-columns: 130px 1fr 1fr 1fr 120px 60px;
+    gap: var(--space-sm);
+    align-items: center;
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid rgba(26, 58, 92, 0.2);
+}
+@media (max-width: 900px) {
+    .meeting-entry { grid-template-columns: 1fr 1fr; }
+}
+.meeting-entry input, .meeting-entry select {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+}
+.meeting-entry input:focus, .meeting-entry select:focus { border-color: var(--teal); }
+.meeting-entry select { cursor: pointer; }
+.meeting-entry select option { background: var(--bg-secondary); }
+.meeting-header {
+    display: grid;
+    grid-template-columns: 130px 1fr 1fr 1fr 120px 60px;
+    gap: var(--space-sm);
+    padding: var(--space-sm) 0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-tertiary);
+    border-bottom: 1px solid var(--border-subtle);
+}
+@media (max-width: 900px) {
+    .meeting-header { display: none; }
+}
+.btn-icon {
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    color: var(--danger);
+    cursor: pointer;
+    padding: 6px 10px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+.btn-icon:hover { border-color: var(--danger); background: rgba(248,113,113,0.1); }
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 13px;
+}
+.meetings-summary {
+    display: flex;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    flex-wrap: wrap;
+}
+.meetings-stat {
+    text-align: center;
+    padding: var(--space-md) var(--space-lg);
+}
+.meetings-stat .stat-value {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--teal);
+}
+.meetings-stat .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-tertiary);
+    margin-top: var(--space-xs);
+}
+.api-fetch-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+    padding: var(--space-md);
+    background: var(--teal-dim);
+    border-radius: 10px;
+    flex-wrap: wrap;
+}
+.api-fetch-bar span {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+.fetch-status {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-left: auto;
+}
+.fetch-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border-subtle);
+    border-top-color: var(--teal);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- Aurora Background -->
+<div class="aurora-container">
+    <div class="aurora-blob"></div>
+    <div class="aurora-blob"></div>
+    <div class="aurora-blob"></div>
+</div>
+
+<!-- Confetti Canvas -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- Toast Notifications -->
+<div class="toast-container" id="toast-container"></div>
+
+<div class="app">
+
+    <!-- Header -->
+    <header class="header">
+        <div>
+            <div class="logo">Z<span>A</span>VMO</div>
+            <div class="header-subtitle">Weekly Marketing Tracker &mdash; Q2 2026</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:var(--space-md);">
+            <span class="save-indicator" id="save-indicator">Saved</span>
+            <div class="week-selector">
+                <label for="week-select">Week:</label>
+                <select id="week-select"></select>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs" role="tablist">
+        <button class="tab active" data-tab="dashboard" role="tab" aria-selected="true">Dashboard</button>
+        <button class="tab" data-tab="entry" role="tab">Data Entry</button>
+        <button class="tab" data-tab="trends" role="tab">Trends</button>
+        <button class="tab" data-tab="achievements" role="tab">Achievements</button>
+        <button class="tab" data-tab="meetings" role="tab">Booked Meetings</button>
+        <button class="tab" data-tab="history" role="tab">Full History</button>
+        <button class="tab" data-tab="settings" role="tab">Settings</button>
+    </nav>
+
+    <!-- ========== DASHBOARD TAB ========== -->
+    <section class="section active" id="section-dashboard">
+        <div class="kpi-grid" id="kpi-grid"></div>
+        <div class="chart-grid">
+            <div class="glass-card chart-card">
+                <div class="chart-title">Demo Meetings &mdash; Target vs Actual</div>
+                <div class="chart-container"><canvas id="chart-meetings"></canvas></div>
+            </div>
+            <div class="glass-card chart-card">
+                <div class="chart-title">LinkedIn Followers (Cumulative)</div>
+                <div class="chart-container"><canvas id="chart-followers"></canvas></div>
+            </div>
+            <div class="glass-card chart-card">
+                <div class="chart-title">Website Unique Visitors</div>
+                <div class="chart-container"><canvas id="chart-visitors"></canvas></div>
+            </div>
+            <div class="glass-card chart-card">
+                <div class="chart-title">Lead Generation Funnel</div>
+                <div class="chart-container"><canvas id="chart-leads"></canvas></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== DATA ENTRY TAB ========== -->
+    <section class="section" id="section-entry">
+        <div class="api-fetch-bar" id="ga4-fetch-bar" style="display:none;">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--teal)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span>GA4 connected — website metrics can be auto-filled</span>
+            <button class="btn-primary btn-sm" onclick="fetchGA4Data()">Auto-fill Website Data</button>
+            <span class="fetch-status" id="ga4-entry-status"></span>
+        </div>
+        <div class="glass-card">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <span id="entry-title">Week 1 Data Entry</span>
+            </div>
+            <form id="data-form" class="form-grid">
+                <!-- Populated by JS -->
+            </form>
+        </div>
+    </section>
+
+    <!-- ========== TRENDS TAB ========== -->
+    <section class="section" id="section-trends">
+        <div class="chart-grid">
+            <div class="glass-card chart-card">
+                <div class="chart-title">LinkedIn Post Impressions</div>
+                <div class="chart-container"><canvas id="chart-impressions"></canvas></div>
+            </div>
+            <div class="glass-card chart-card">
+                <div class="chart-title">Engagement Rate %</div>
+                <div class="chart-container"><canvas id="chart-engagement"></canvas></div>
+            </div>
+            <div class="glass-card chart-card">
+                <div class="chart-title">Content Output (Posts + Articles)</div>
+                <div class="chart-container"><canvas id="chart-content"></canvas></div>
+            </div>
+            <div class="glass-card chart-card">
+                <div class="chart-title">Outreach Activity</div>
+                <div class="chart-container"><canvas id="chart-outreach"></canvas></div>
+            </div>
+            <div class="glass-card chart-card">
+                <div class="chart-title">Session Duration (seconds)</div>
+                <div class="chart-container"><canvas id="chart-duration"></canvas></div>
+            </div>
+            <div class="glass-card chart-card">
+                <div class="chart-title">Newsletter Growth (JLT + Zavmo)</div>
+                <div class="chart-container"><canvas id="chart-newsletters"></canvas></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== ACHIEVEMENTS TAB ========== -->
+    <section class="section" id="section-achievements">
+        <div class="section-title" style="margin-bottom:var(--space-lg);">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Achievements</span>
+        </div>
+        <div class="achievements-grid" id="achievements-grid"></div>
+    </section>
+
+    <!-- ========== FULL HISTORY TAB ========== -->
+    <section class="section" id="section-history">
+        <div class="export-bar">
+            <button class="btn-secondary" onclick="exportCSV()">Export CSV</button>
+        </div>
+        <div class="glass-card table-wrapper">
+            <table id="history-table">
+                <thead id="history-thead"></thead>
+                <tbody id="history-tbody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ========== BOOKED MEETINGS TAB ========== -->
+    <section class="section" id="section-meetings">
+        <div class="meetings-summary" id="meetings-summary"></div>
+
+        <div class="api-fetch-bar" id="cal-fetch-bar" style="display:none;">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--teal)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>Google Calendar connected</span>
+            <button class="btn-primary btn-sm" onclick="fetchCalendarMeetings()">Pull Meetings from Calendar</button>
+            <span class="fetch-status" id="cal-fetch-status"></span>
+        </div>
+
+        <div class="glass-card">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--teal)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Booked Meetings Log</span>
+            </div>
+
+            <div class="meeting-header">
+                <span>Date</span>
+                <span>Company / Prospect</span>
+                <span>Contact Name</span>
+                <span>Booked By</span>
+                <span>Status</span>
+                <span></span>
+            </div>
+            <div id="meetings-list"></div>
+
+            <div style="margin-top:var(--space-md); display:flex; gap:var(--space-sm);">
+                <button class="btn-primary btn-sm" onclick="addMeeting()">Add Meeting</button>
+                <button class="btn-secondary btn-sm" onclick="exportMeetingsCSV()">Export Meetings CSV</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SETTINGS TAB ========== -->
+    <section class="section" id="section-settings">
+        <div class="glass-card" style="max-width:600px;">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--teal)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Settings</span>
+            </div>
+
+            <div class="settings-group">
+                <label for="webhook-url">Google Apps Script Web App URL</label>
+                <input type="url" id="webhook-url" placeholder="https://script.google.com/macros/s/your-id/exec">
+                <div class="help-text">
+                    This is the URL of the Google Apps Script that bridges to your Google Chat space.
+                    See the setup guide in README.md for step-by-step instructions.
+                </div>
+                <div id="webhook-status"></div>
+            </div>
+
+            <div class="settings-group">
+                <label for="dashboard-url">Dashboard Public URL</label>
+                <input type="url" id="dashboard-url" placeholder="https://iridescent-technologies.github.io/Marketing/" value="https://iridescent-technologies.github.io/Marketing/">
+                <div class="help-text">The public URL of this dashboard — included in Google Chat notifications as a link.</div>
+            </div>
+
+            <div class="notification-toggle">
+                <div class="toggle-switch" id="notify-toggle" role="switch" aria-checked="false" tabindex="0"></div>
+                <span style="font-size:13px;color:var(--text-secondary);">Send Google Chat notification when weekly data is saved</span>
+            </div>
+
+            <div style="margin-top:var(--space-lg);display:flex;gap:var(--space-md);">
+                <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+                <button class="btn-secondary" onclick="testNotification()">Test Notification</button>
+            </div>
+        </div>
+
+        <div class="glass-card" style="max-width:600px; margin-top:var(--space-lg);">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--teal)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <span>Google Analytics 4 Integration</span>
+            </div>
+
+            <div class="settings-group">
+                <label for="ga4-property">GA4 Property ID</label>
+                <input type="text" id="ga4-property" placeholder="e.g. 123456789">
+                <div class="help-text">
+                    Find this in GA4: Admin > Property > Property details. It's the numeric ID (not the Measurement ID starting with G-).
+                </div>
+            </div>
+
+            <div class="notification-toggle">
+                <div class="toggle-switch" id="ga4-toggle" role="switch" aria-checked="false" tabindex="0"></div>
+                <span style="font-size:13px;color:var(--text-secondary);">Enable GA4 auto-fetch (pulls website metrics via API)</span>
+            </div>
+
+            <div style="margin-top:var(--space-md);">
+                <button class="btn-secondary btn-sm" onclick="fetchGA4Data()">Fetch GA4 Data Now</button>
+                <span class="fetch-status" id="ga4-fetch-status"></span>
+            </div>
+        </div>
+
+        <div class="glass-card" style="max-width:600px; margin-top:var(--space-lg);">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--teal)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>Google Calendar Integration</span>
+            </div>
+
+            <div class="settings-group">
+                <label for="cal-search">Calendar Search Terms</label>
+                <input type="text" id="cal-search" placeholder="demo, zavmo, discovery call" value="demo, zavmo, discovery">
+                <div class="help-text">
+                    Comma-separated keywords to match in calendar event titles when pulling meetings. The Apps Script will search for events containing any of these terms.
+                </div>
+            </div>
+
+            <div class="notification-toggle">
+                <div class="toggle-switch" id="cal-toggle" role="switch" aria-checked="false" tabindex="0"></div>
+                <span style="font-size:13px;color:var(--text-secondary);">Enable Google Calendar meeting pull</span>
+            </div>
+        </div>
+
+        <div class="glass-card" style="max-width:600px; margin-top:var(--space-lg);">
+            <div class="section-title">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--teal)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                <span>LinkedIn (Coming Soon)</span>
+            </div>
+            <p style="font-size:13px;color:var(--text-tertiary);line-height:1.6;">
+                LinkedIn's API requires a formal application review process which typically takes several weeks. Once approved, we can auto-pull follower counts, post impressions, engagement rates, and profile visits. For now, these metrics are entered manually on the Data Entry tab. We'll update this section when API access is granted.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="text-align:center; padding:var(--space-2xl) 0 var(--space-lg); color:var(--text-tertiary); font-size:12px;">
+        <div class="logo" style="font-size:16px; margin-bottom:var(--space-sm);">Z<span style="color:var(--teal)">A</span>VMO</div>
+        Making learning as unique as you are
+    </footer>
+</div>
+
+<!-- Chart.js from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script>
+/* ============================================================
+   DATA MODEL & TARGETS
+   ============================================================ */
+const WEEKS = 12;
+const WEEK_DATES = [];
+const startDate = new Date(2026, 2, 30); // 30 Mar 2026
+for (let i = 0; i < WEEKS; i++) {
+    const d = new Date(startDate);
+    d.setDate(d.getDate() + i * 7);
+    WEEK_DATES.push(d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }));
+}
+
+const METRICS = [
+    // Activity Inputs
+    { key: 'linkedin_posts', label: 'LinkedIn Posts Published', section: 'Activity Inputs', targets: [3,3,4,4,4,5,5,5,5,5,5,5] },
+    { key: 'outreach_messages', label: 'Outreach Messages Sent', section: 'Activity Inputs', targets: [20,25,30,30,35,35,40,40,45,45,50,50] },
+    { key: 'connection_requests', label: 'Connection Requests Sent', section: 'Activity Inputs', targets: [15,20,25,25,30,30,35,35,40,40,40,40] },
+    { key: 'articles_published', label: 'Articles / Long-form Published', section: 'Activity Inputs', targets: [1,1,1,1,1,1,1,1,2,2,2,2] },
+    { key: 'website_pages', label: 'Website Pages Published/Updated', section: 'Activity Inputs', targets: [2,2,2,3,3,3,3,3,2,2,2,2] },
+    { key: 'jlt_newsletter', label: 'JLT Newsletter Issues Sent', section: 'Content Output', targets: [1,1,1,1,1,1,1,1,1,1,1,1] },
+    { key: 'zavmo_newsletter', label: 'Zavmo Newsletter Issues Sent', section: 'Content Output', targets: [0,1,0,1,0,1,0,1,0,1,0,1] },
+    { key: 'new_articles_website', label: 'New Articles on Zavmo Website', section: 'Content Output', targets: [1,1,2,2,2,2,3,3,3,3,4,4] },
+    // LinkedIn Growth
+    { key: 'new_followers', label: 'New Followers (This Week)', section: 'LinkedIn Growth', targets: [15,20,25,30,35,40,45,50,55,60,65,70] },
+    { key: 'total_followers', label: 'Total Followers (Cumulative)', section: 'LinkedIn Growth', targets: [315,335,360,390,425,465,510,560,615,675,740,810], cumulative: true },
+    { key: 'post_impressions', label: 'Post Impressions', section: 'LinkedIn Growth', targets: [500,650,800,1000,1200,1500,1800,2100,2500,2900,3400,4000] },
+    { key: 'engagement_rate', label: 'Engagement Rate %', section: 'LinkedIn Growth', targets: [2.0,2.0,2.5,2.5,3.0,3.0,3.5,3.5,4.0,4.0,4.0,4.0], suffix: '%', step: '0.1' },
+    { key: 'profile_visits', label: 'Profile Visits', section: 'LinkedIn Growth', targets: [30,40,50,60,75,90,105,120,140,160,180,200] },
+    // Website
+    { key: 'unique_visitors', label: 'Unique Visitors', section: 'Website Performance', targets: [60,75,90,110,130,155,180,210,245,280,320,370] },
+    { key: 'page_views', label: 'Total Page Views', section: 'Website Performance', targets: [150,190,230,280,340,400,470,550,640,740,850,980] },
+    { key: 'avg_session_duration', label: 'Avg Session Duration (sec)', section: 'Website Performance', targets: [45,50,55,60,65,70,75,80,85,90,95,100] },
+    { key: 'pages_per_session', label: 'Pages Per Session', section: 'Website Performance', targets: [1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2,2.3,2.4,2.5,2.6], step: '0.1' },
+    { key: 'bounce_rate', label: 'Bounce Rate %', section: 'Website Performance', targets: [80,78,75,73,70,68,65,63,60,58,55,53], suffix: '%', lowerBetter: true, step: '0.1' },
+    // Leads
+    { key: 'form_submissions', label: 'Contact Form Submissions', section: 'Lead Generation', targets: [0,1,1,2,2,3,3,4,4,5,5,6] },
+    { key: 'content_downloads', label: 'Content Downloads', section: 'Lead Generation', targets: [1,2,3,4,5,6,7,8,10,12,14,16] },
+    { key: 'newsletter_signups', label: 'Newsletter Sign-ups', section: 'Lead Generation', targets: [2,3,4,5,6,8,10,12,14,16,18,20] },
+    { key: 'linkedin_conversations', label: 'LinkedIn Conversations Started', section: 'Lead Generation', targets: [3,4,5,6,8,10,12,14,16,18,20,22] },
+    // Pipeline
+    { key: 'demo_meetings', label: 'Demo Meetings Booked', section: 'Meetings & Pipeline', targets: [0,0,1,1,1,2,2,2,3,3,3,4], primary: true },
+    { key: 'proposals_sent', label: 'Proposals Sent', section: 'Meetings & Pipeline', targets: [0,0,0,1,1,1,1,2,2,2,3,3] },
+];
+
+// Achievements
+const ACHIEVEMENTS = [
+    { id: 'first_meeting', name: 'First Blood', desc: 'Book your first demo meeting', icon: 'target', check: d => d.some(w => (w.demo_meetings||0) >= 1) },
+    { id: 'triple_post', name: 'Content Machine', desc: 'Publish 5+ LinkedIn posts in a week', icon: 'edit', check: d => d.some(w => (w.linkedin_posts||0) >= 5) },
+    { id: 'outreach_50', name: 'Outreach Warrior', desc: 'Send 50+ outreach messages in a week', icon: 'send', check: d => d.some(w => (w.outreach_messages||0) >= 50) },
+    { id: 'followers_50', name: 'Growth Spurt', desc: 'Gain 50+ new followers in a single week', icon: 'trending-up', check: d => d.some(w => (w.new_followers||0) >= 50) },
+    { id: 'followers_500', name: 'Half K Club', desc: 'Reach 500 total LinkedIn followers', icon: 'users', check: d => d.some(w => (w.total_followers||0) >= 500) },
+    { id: 'followers_1000', name: 'The Thousand', desc: 'Reach 1,000 total LinkedIn followers', icon: 'award', check: d => d.some(w => (w.total_followers||0) >= 1000) },
+    { id: 'engagement_4', name: 'Engagement Expert', desc: 'Hit 4%+ engagement rate', icon: 'heart', check: d => d.some(w => (w.engagement_rate||0) >= 4) },
+    { id: 'visitors_200', name: 'Traffic Builder', desc: '200+ unique visitors in a week', icon: 'globe', check: d => d.some(w => (w.unique_visitors||0) >= 200) },
+    { id: 'visitors_500', name: 'Destination Site', desc: '500+ unique visitors in a week', icon: 'zap', check: d => d.some(w => (w.unique_visitors||0) >= 500) },
+    { id: 'perfect_week', name: 'Perfect Week', desc: 'Hit every single target in a week', icon: 'check-circle', check: (d, i) => d.some((w, wi) => checkPerfectWeek(w, wi)) },
+    { id: 'three_meetings', name: 'Pipeline Pro', desc: 'Book 3+ demo meetings in a single week', icon: 'calendar', check: d => d.some(w => (w.demo_meetings||0) >= 3) },
+    { id: 'newsletter_duo', name: 'Newsletter Duo', desc: 'Send both JLT and Zavmo newsletters in the same week', icon: 'mail', check: d => d.some(w => (w.jlt_newsletter||0) >= 1 && (w.zavmo_newsletter||0) >= 1) },
+    { id: 'article_streak', name: 'Publishing Streak', desc: 'Publish 2+ articles for 3 consecutive weeks', icon: 'book-open', check: d => checkStreak(d, 'new_articles_website', 2, 3) },
+    { id: 'conversion_king', name: 'Conversion Royalty', desc: '5+ form submissions in a week', icon: 'inbox', check: d => d.some(w => (w.form_submissions||0) >= 5) },
+    { id: 'download_machine', name: 'Download Machine', desc: '15+ content downloads in a week', icon: 'download', check: d => d.some(w => (w.content_downloads||0) >= 15) },
+    { id: 'streak_3', name: 'Hat-trick', desc: 'Hit meeting target 3 weeks running', icon: 'star', check: d => checkTargetStreak(d, 'demo_meetings', 3) },
+];
+
+function checkPerfectWeek(weekData, weekIndex) {
+    if (!weekData || Object.keys(weekData).length === 0) return false;
+    return METRICS.every(m => {
+        const val = weekData[m.key];
+        if (val === undefined || val === null || val === '') return false;
+        if (m.lowerBetter) return parseFloat(val) <= m.targets[weekIndex];
+        return parseFloat(val) >= m.targets[weekIndex];
+    });
+}
+
+function checkStreak(data, key, minVal, streakLen) {
+    let streak = 0;
+    for (const w of data) {
+        if ((w[key] || 0) >= minVal) { streak++; if (streak >= streakLen) return true; }
+        else streak = 0;
+    }
+    return false;
+}
+
+function checkTargetStreak(data, key, streakLen) {
+    let streak = 0;
+    for (let i = 0; i < data.length; i++) {
+        const m = METRICS.find(x => x.key === key);
+        if (data[i][key] !== undefined && parseFloat(data[i][key]) >= m.targets[i]) {
+            streak++; if (streak >= streakLen) return true;
+        } else streak = 0;
+    }
+    return false;
+}
+
+/* ============================================================
+   DATA PERSISTENCE (localStorage)
+   ============================================================ */
+const STORAGE_KEY = 'zavmo_tracker_q2_2026';
+
+function loadData() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return Array.from({ length: WEEKS }, () => ({}));
+}
+
+function saveData(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    const el = document.getElementById('save-indicator');
+    el.classList.add('visible');
+    setTimeout(() => el.classList.remove('visible'), 2000);
+}
+
+let weeklyData = loadData();
+let currentWeek = 0;
+let previousAchievements = new Set();
+
+/* ============================================================
+   SVG ICONS (outline, 2px stroke)
+   ============================================================ */
+const ICONS = {
+    'target': '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+    'edit': '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+    'send': '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+    'trending-up': '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+    'users': '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    'award': '<circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>',
+    'heart': '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+    'globe': '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+    'zap': '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    'check-circle': '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+    'calendar': '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+    'mail': '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+    'book-open': '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+    'inbox': '<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+    'download': '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+    'star': '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+};
+
+function icon(name) {
+    return `<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        document.getElementById('section-' + tab.dataset.tab).classList.add('active');
+        if (tab.dataset.tab === 'trends' || tab.dataset.tab === 'dashboard') renderCharts();
+    });
+});
+
+/* ============================================================
+   WEEK SELECTOR
+   ============================================================ */
+const weekSelect = document.getElementById('week-select');
+for (let i = 0; i < WEEKS; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `Week ${i+1} (${WEEK_DATES[i]})`;
+    weekSelect.appendChild(opt);
+}
+weekSelect.addEventListener('change', () => {
+    currentWeek = parseInt(weekSelect.value);
+    renderAll();
+});
+
+/* ============================================================
+   RENDER KPIs
+   ============================================================ */
+function renderKPIs() {
+    const grid = document.getElementById('kpi-grid');
+    const wd = weeklyData[currentWeek] || {};
+    const kpiMetrics = [
+        { key: 'demo_meetings', label: 'Demo Meetings', primary: true },
+        { key: 'total_followers', label: 'LinkedIn Followers' },
+        { key: 'unique_visitors', label: 'Website Visitors' },
+        { key: 'form_submissions', label: 'Form Submissions' },
+        { key: 'content_downloads', label: 'Content Downloads' },
+    ];
+
+    grid.innerHTML = kpiMetrics.map(kpi => {
+        const m = METRICS.find(x => x.key === kpi.key);
+        const target = m.targets[currentWeek];
+        const actual = wd[kpi.key] !== undefined && wd[kpi.key] !== '' ? parseFloat(wd[kpi.key]) : null;
+        const pct = actual !== null && target > 0 ? Math.min((actual / target) * 100, 150) : 0;
+        const status = actual === null ? '' : (actual >= target ? 'on-track' : (actual >= target * 0.7 ? 'close' : 'behind'));
+        return `
+        <div class="glass-card kpi-card ${kpi.primary ? 'primary' : ''}">
+            <div class="kpi-label">${kpi.label}</div>
+            <div class="kpi-value">${actual !== null ? Math.round(actual).toLocaleString() : '&mdash;'}</div>
+            <div class="kpi-target">Target: ${target.toLocaleString()}${m.suffix||''}</div>
+            <div class="kpi-bar"><div class="kpi-bar-fill ${status}" style="width:${pct}%"></div></div>
+        </div>`;
+    }).join('');
+}
+
+/* ============================================================
+   RENDER FORM
+   ============================================================ */
+function renderForm() {
+    const form = document.getElementById('data-form');
+    const wd = weeklyData[currentWeek] || {};
+    document.getElementById('entry-title').textContent = `Week ${currentWeek+1} (${WEEK_DATES[currentWeek]}) Data Entry`;
+
+    let html = '';
+    let lastSection = '';
+    METRICS.forEach(m => {
+        if (m.section !== lastSection) {
+            lastSection = m.section;
+            html += `<div class="form-section-label">${m.section}</div>`;
+        }
+        const val = wd[m.key] !== undefined ? wd[m.key] : '';
+        html += `
+        <div class="form-group">
+            <label for="input-${m.key}">${m.label}</label>
+            <div class="form-row">
+                <input type="number" id="input-${m.key}" name="${m.key}"
+                       value="${val}" placeholder="Enter actual..."
+                       step="${m.step || '1'}" min="0"
+                       aria-label="${m.label}">
+                <span class="target-badge">Target: ${m.targets[currentWeek]}${m.suffix||''}</span>
+            </div>
+        </div>`;
+    });
+
+    html += `
+    <div class="form-actions">
+        <button type="submit" class="btn-primary">Save Week ${currentWeek+1}</button>
+        <button type="button" class="btn-secondary" onclick="clearWeek()">Clear Week</button>
+    </div>`;
+
+    form.innerHTML = html;
+}
+
+document.getElementById('data-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const oldAchievements = getUnlockedAchievements();
+
+    METRICS.forEach(m => {
+        const input = document.getElementById('input-' + m.key);
+        if (input && input.value !== '') {
+            weeklyData[currentWeek][m.key] = parseFloat(input.value);
+        } else if (input) {
+            delete weeklyData[currentWeek][m.key];
+        }
+    });
+
+    saveData(weeklyData);
+    renderAll();
+
+    // Check for new achievements
+    const newAchievements = getUnlockedAchievements();
+    const brandNew = newAchievements.filter(a => !oldAchievements.includes(a));
+    if (brandNew.length > 0) {
+        launchConfetti();
+        brandNew.forEach((a, i) => {
+            setTimeout(() => showToast(a.name, a.desc), i * 800);
+        });
+    }
+
+    // Check target hits for the current week
+    const targetsHit = METRICS.filter(m => {
+        const val = weeklyData[currentWeek][m.key];
+        if (val === undefined) return false;
+        if (m.lowerBetter) return parseFloat(val) <= m.targets[currentWeek];
+        return parseFloat(val) >= m.targets[currentWeek];
+    }).length;
+
+    if (targetsHit === METRICS.length && brandNew.length === 0) {
+        launchConfetti();
+        showToast('Perfect Week!', 'Every single target smashed!');
+    } else if (targetsHit > METRICS.length * 0.8 && brandNew.length === 0) {
+        showToast('Brilliant Week!', `${targetsHit}/${METRICS.length} targets hit!`);
+    }
+
+    // Send Google Chat notification
+    sendGoogleChatNotification(currentWeek, brandNew);
+});
+
+function clearWeek() {
+    if (confirm(`Clear all data for Week ${currentWeek+1}?`)) {
+        weeklyData[currentWeek] = {};
+        saveData(weeklyData);
+        renderAll();
+    }
+}
+
+/* ============================================================
+   RENDER ACHIEVEMENTS
+   ============================================================ */
+function getUnlockedAchievements() {
+    return ACHIEVEMENTS.filter(a => a.check(weeklyData));
+}
+
+function renderAchievements() {
+    const grid = document.getElementById('achievements-grid');
+    grid.innerHTML = ACHIEVEMENTS.map(a => {
+        const unlocked = a.check(weeklyData);
+        let unlockedWeek = '';
+        if (unlocked) {
+            for (let i = 0; i < WEEKS; i++) {
+                if (a.check(weeklyData.slice(0, i+1))) { unlockedWeek = `Unlocked: Week ${i+1}`; break; }
+            }
+        }
+        return `
+        <div class="glass-card achievement-card ${unlocked ? 'unlocked' : 'locked'}">
+            <div class="achievement-icon">${icon(a.icon)}</div>
+            <div class="achievement-name">${a.name}</div>
+            <div class="achievement-desc">${a.desc}</div>
+            ${unlocked ? `<div class="achievement-week">${unlockedWeek}</div>` : ''}
+        </div>`;
+    }).join('');
+}
+
+/* ============================================================
+   CHARTS
+   ============================================================ */
+const chartInstances = {};
+const TEAL = '#00d9c0';
+const TEAL_ALPHA = 'rgba(0, 217, 192, 0.15)';
+const GREY = '#6b7c93';
+const GREY_ALPHA = 'rgba(107, 124, 147, 0.2)';
+
+const chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { intersect: false, mode: 'index' },
+    plugins: {
+        legend: { labels: { color: '#b8c5d6', font: { size: 11, family: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Inter", sans-serif' } } },
+        tooltip: {
+            backgroundColor: '#0d1e36',
+            borderColor: 'rgba(26, 58, 92, 0.5)',
+            borderWidth: 1,
+            titleColor: '#ffffff',
+            bodyColor: '#b8c5d6',
+            cornerRadius: 8,
+            padding: 12,
+        }
+    },
+    scales: {
+        x: { grid: { color: 'rgba(26, 58, 92, 0.3)' }, ticks: { color: '#6b7c93', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(26, 58, 92, 0.3)' }, ticks: { color: '#6b7c93', font: { size: 11 } }, beginAtZero: true }
+    }
+};
+
+function makeChart(canvasId, config) {
+    if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    chartInstances[canvasId] = new Chart(ctx, config);
+}
+
+function getActuals(key) {
+    return weeklyData.map(w => w[key] !== undefined && w[key] !== '' ? parseFloat(w[key]) : null);
+}
+function getTargets(key) {
+    const m = METRICS.find(x => x.key === key);
+    return m ? m.targets : [];
+}
+
+function renderCharts() {
+    const labels = WEEK_DATES.map((d,i) => `W${i+1}`);
+    const baseOpts = JSON.parse(JSON.stringify(chartDefaults));
+
+    // Dashboard charts
+    makeChart('chart-meetings', {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Target', data: getTargets('demo_meetings'), backgroundColor: GREY_ALPHA, borderColor: GREY, borderWidth: 1, borderRadius: 4 },
+                { label: 'Actual', data: getActuals('demo_meetings'), backgroundColor: TEAL_ALPHA, borderColor: TEAL, borderWidth: 1, borderRadius: 4 }
+            ]
+        },
+        options: baseOpts
+    });
+
+    makeChart('chart-followers', {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Target', data: getTargets('total_followers'), borderColor: GREY, backgroundColor: GREY_ALPHA, borderDash: [5,5], pointRadius: 3, fill: false },
+                { label: 'Actual', data: getActuals('total_followers'), borderColor: TEAL, backgroundColor: TEAL_ALPHA, pointRadius: 4, fill: true, tension: 0.3 }
+            ]
+        },
+        options: baseOpts
+    });
+
+    makeChart('chart-visitors', {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Target', data: getTargets('unique_visitors'), borderColor: GREY, borderDash: [5,5], pointRadius: 3, fill: false },
+                { label: 'Actual', data: getActuals('unique_visitors'), borderColor: TEAL, backgroundColor: TEAL_ALPHA, pointRadius: 4, fill: true, tension: 0.3 }
+            ]
+        },
+        options: baseOpts
+    });
+
+    makeChart('chart-leads', {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Form Submissions', data: getActuals('form_submissions'), backgroundColor: 'rgba(0, 217, 192, 0.6)', borderRadius: 4 },
+                { label: 'Content Downloads', data: getActuals('content_downloads'), backgroundColor: 'rgba(0, 217, 192, 0.35)', borderRadius: 4 },
+                { label: 'Newsletter Sign-ups', data: getActuals('newsletter_signups'), backgroundColor: 'rgba(0, 217, 192, 0.15)', borderRadius: 4 },
+            ]
+        },
+        options: { ...baseOpts, scales: { ...baseOpts.scales, x: { ...baseOpts.scales.x, stacked: true }, y: { ...baseOpts.scales.y, stacked: true } } }
+    });
+
+    // Trend charts
+    makeChart('chart-impressions', {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Target', data: getTargets('post_impressions'), borderColor: GREY, borderDash: [5,5], pointRadius: 3, fill: false },
+                { label: 'Actual', data: getActuals('post_impressions'), borderColor: TEAL, backgroundColor: TEAL_ALPHA, pointRadius: 4, fill: true, tension: 0.3 }
+            ]
+        },
+        options: baseOpts
+    });
+
+    makeChart('chart-engagement', {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Target %', data: getTargets('engagement_rate'), borderColor: GREY, borderDash: [5,5], pointRadius: 3, fill: false },
+                { label: 'Actual %', data: getActuals('engagement_rate'), borderColor: TEAL, backgroundColor: TEAL_ALPHA, pointRadius: 4, fill: true, tension: 0.3 }
+            ]
+        },
+        options: baseOpts
+    });
+
+    makeChart('chart-content', {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                { label: 'LinkedIn Posts (Target)', data: getTargets('linkedin_posts'), backgroundColor: GREY_ALPHA, borderRadius: 4 },
+                { label: 'LinkedIn Posts (Actual)', data: getActuals('linkedin_posts'), backgroundColor: 'rgba(0, 217, 192, 0.5)', borderRadius: 4 },
+                { label: 'Articles (Target)', data: getTargets('new_articles_website'), backgroundColor: 'rgba(107,124,147,0.1)', borderColor: GREY, borderWidth: 1, borderRadius: 4 },
+                { label: 'Articles (Actual)', data: getActuals('new_articles_website'), backgroundColor: TEAL_ALPHA, borderColor: TEAL, borderWidth: 1, borderRadius: 4 },
+            ]
+        },
+        options: baseOpts
+    });
+
+    makeChart('chart-outreach', {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Messages (Target)', data: getTargets('outreach_messages'), backgroundColor: GREY_ALPHA, borderRadius: 4 },
+                { label: 'Messages (Actual)', data: getActuals('outreach_messages'), backgroundColor: 'rgba(0, 217, 192, 0.5)', borderRadius: 4 },
+                { label: 'Connections (Target)', data: getTargets('connection_requests'), backgroundColor: 'rgba(107,124,147,0.1)', borderRadius: 4 },
+                { label: 'Connections (Actual)', data: getActuals('connection_requests'), backgroundColor: TEAL_ALPHA, borderRadius: 4 },
+            ]
+        },
+        options: baseOpts
+    });
+
+    makeChart('chart-duration', {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Target (sec)', data: getTargets('avg_session_duration'), borderColor: GREY, borderDash: [5,5], pointRadius: 3, fill: false },
+                { label: 'Actual (sec)', data: getActuals('avg_session_duration'), borderColor: TEAL, backgroundColor: TEAL_ALPHA, pointRadius: 4, fill: true, tension: 0.3 }
+            ]
+        },
+        options: baseOpts
+    });
+
+    makeChart('chart-newsletters', {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                { label: 'JLT Newsletter', data: getActuals('jlt_newsletter'), backgroundColor: 'rgba(0, 217, 192, 0.6)', borderRadius: 4 },
+                { label: 'Zavmo Newsletter', data: getActuals('zavmo_newsletter'), backgroundColor: TEAL_ALPHA, borderRadius: 4 },
+            ]
+        },
+        options: { ...baseOpts, scales: { ...baseOpts.scales, x: { ...baseOpts.scales.x, stacked: true }, y: { ...baseOpts.scales.y, stacked: true } } }
+    });
+}
+
+/* ============================================================
+   RENDER HISTORY TABLE
+   ============================================================ */
+function renderHistory() {
+    const thead = document.getElementById('history-thead');
+    const tbody = document.getElementById('history-tbody');
+
+    thead.innerHTML = `<tr>
+        <th>Metric</th>
+        ${WEEK_DATES.map((d,i) => `<th>W${i+1}<br><span style="font-weight:400;text-transform:none">${d}</span></th>`).join('')}
+    </tr>`;
+
+    let html = '';
+    let lastSection = '';
+    METRICS.forEach(m => {
+        if (m.section !== lastSection) {
+            lastSection = m.section;
+            html += `<tr><td colspan="${WEEKS+1}" style="font-weight:600;color:var(--teal);padding-top:16px;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border-subtle);">${m.section}</td></tr>`;
+        }
+        html += `<tr><td style="font-weight:500;color:var(--text-primary);min-width:200px">${m.label}</td>`;
+        for (let w = 0; w < WEEKS; w++) {
+            const actual = weeklyData[w][m.key];
+            const target = m.targets[w];
+            if (actual !== undefined && actual !== '') {
+                const v = parseFloat(actual);
+                let cls = 'var-zero';
+                if (m.lowerBetter) cls = v <= target ? 'var-positive' : 'var-negative';
+                else cls = v >= target ? 'var-positive' : 'var-negative';
+                html += `<td class="${cls}">${v}${m.suffix||''} <span style="opacity:0.4;font-size:11px">/ ${target}</span></td>`;
+            } else {
+                html += `<td style="color:var(--text-tertiary)">&mdash; <span style="opacity:0.3;font-size:11px">/ ${target}</span></td>`;
+            }
+        }
+        html += '</tr>';
+    });
+
+    tbody.innerHTML = html;
+}
+
+/* ============================================================
+   EXPORT CSV
+   ============================================================ */
+function exportCSV() {
+    let csv = 'Metric,' + WEEK_DATES.map((d,i) => `"Week ${i+1} Target","Week ${i+1} Actual"`).join(',') + '\n';
+    METRICS.forEach(m => {
+        csv += `"${m.label}",`;
+        csv += m.targets.map((t,i) => `${t},${weeklyData[i][m.key] !== undefined ? weeklyData[i][m.key] : ''}`).join(',');
+        csv += '\n';
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'zavmo_marketing_tracker_q2_2026.csv';
+    a.click();
+}
+
+/* ============================================================
+   CONFETTI
+   ============================================================ */
+function launchConfetti() {
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    const colors = ['#00d9c0', '#00ffeb', '#ffffff', '#ffd700', '#b8c5d6'];
+
+    for (let i = 0; i < 150; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            w: Math.random() * 10 + 4,
+            h: Math.random() * 6 + 2,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            vy: Math.random() * 3 + 2,
+            vx: (Math.random() - 0.5) * 2,
+            rotation: Math.random() * 360,
+            rotSpeed: (Math.random() - 0.5) * 10,
+            opacity: 1,
+        });
+    }
+
+    let frame = 0;
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        frame++;
+        let alive = false;
+
+        particles.forEach(p => {
+            if (p.opacity <= 0) return;
+            alive = true;
+            p.y += p.vy;
+            p.x += p.vx;
+            p.rotation += p.rotSpeed;
+            if (frame > 60) p.opacity -= 0.008;
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate((p.rotation * Math.PI) / 180);
+            ctx.globalAlpha = Math.max(0, p.opacity);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+            ctx.restore();
+        });
+
+        if (alive && frame < 300) requestAnimationFrame(animate);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    animate();
+}
+
+/* ============================================================
+   TOAST NOTIFICATIONS
+   ============================================================ */
+function showToast(title, message) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `<span class="toast-icon">${icon('star')}</span><span class="toast-text"><strong>${title}</strong><br>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+}
+
+/* ============================================================
+   RENDER ALL
+   ============================================================ */
+function renderAll() {
+    renderKPIs();
+    renderForm();
+    renderAchievements();
+    renderHistory();
+    renderCharts();
+}
+
+/* ============================================================
+   SETTINGS & GOOGLE CHAT NOTIFICATIONS
+   ============================================================ */
+const SETTINGS_KEY = 'zavmo_tracker_settings';
+
+function loadSettings() {
+    try {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return { webhookUrl: '', dashboardUrl: 'https://iridescent-technologies.github.io/Marketing/', notifyEnabled: false, ga4Property: '', ga4Enabled: false, calSearch: 'demo, zavmo, discovery', calEnabled: false };
+}
+
+function renderSettings() {
+    const settings = loadSettings();
+    document.getElementById('webhook-url').value = settings.webhookUrl || '';
+    document.getElementById('dashboard-url').value = settings.dashboardUrl || '';
+    document.getElementById('ga4-property').value = settings.ga4Property || '';
+    document.getElementById('cal-search').value = settings.calSearch || 'demo, zavmo, discovery';
+
+    const toggles = {
+        'notify-toggle': settings.notifyEnabled,
+        'ga4-toggle': settings.ga4Enabled,
+        'cal-toggle': settings.calEnabled
+    };
+    Object.entries(toggles).forEach(([id, enabled]) => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (enabled) { el.classList.add('active'); el.setAttribute('aria-checked', 'true'); }
+            else { el.classList.remove('active'); el.setAttribute('aria-checked', 'false'); }
+        }
+    });
+
+    updateWebhookStatus(settings.webhookUrl);
+
+    // Show/hide GA4 fetch bar on data entry
+    const ga4Bar = document.getElementById('ga4-fetch-bar');
+    if (ga4Bar) ga4Bar.style.display = (settings.webhookUrl && settings.ga4Enabled && settings.ga4Property) ? 'flex' : 'none';
+
+    // Show/hide Calendar fetch bar on meetings tab
+    const calBar = document.getElementById('cal-fetch-bar');
+    if (calBar) calBar.style.display = (settings.webhookUrl && settings.calEnabled) ? 'flex' : 'none';
+}
+
+['notify-toggle', 'ga4-toggle', 'cal-toggle'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('click', function() {
+            this.classList.toggle('active');
+            this.setAttribute('aria-checked', this.classList.contains('active'));
+        });
+        el.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }
+        });
+    }
+});
+
+function updateWebhookStatus(url) {
+    const el = document.getElementById('webhook-status');
+    if (url && url.includes('script.google.com')) {
+        el.innerHTML = '<div class="settings-status connected">Connected</div>';
+    } else if (url) {
+        el.innerHTML = '<div class="settings-status disconnected">URL does not look like a Google Apps Script</div>';
+    } else {
+        el.innerHTML = '<div class="settings-status disconnected">Not configured</div>';
+    }
+}
+
+function saveSettings() {
+    const settings = {
+        webhookUrl: document.getElementById('webhook-url').value.trim(),
+        dashboardUrl: document.getElementById('dashboard-url').value.trim(),
+        notifyEnabled: document.getElementById('notify-toggle').classList.contains('active'),
+        ga4Property: document.getElementById('ga4-property').value.trim(),
+        ga4Enabled: document.getElementById('ga4-toggle').classList.contains('active'),
+        calSearch: document.getElementById('cal-search').value.trim(),
+        calEnabled: document.getElementById('cal-toggle').classList.contains('active')
+    };
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    updateWebhookStatus(settings.webhookUrl);
+    renderSettings();
+    showToast('Settings Saved', 'All integration preferences updated');
+}
+
+function buildNotificationPayload(weekIndex, newAchievements) {
+    const wd = weeklyData[weekIndex] || {};
+    const settings = loadSettings();
+
+    // Build key metrics summary
+    const keyMetrics = METRICS.filter(m => ['demo_meetings','total_followers','unique_visitors','form_submissions','content_downloads','linkedin_posts','outreach_messages','jlt_newsletter','zavmo_newsletter','new_articles_website'].includes(m.key));
+
+    const metricsPayload = keyMetrics.map(m => ({
+        label: m.label,
+        actual: wd[m.key] !== undefined ? wd[m.key] : '—',
+        target: m.targets[weekIndex],
+        hitTarget: wd[m.key] !== undefined && (m.lowerBetter ? parseFloat(wd[m.key]) <= m.targets[weekIndex] : parseFloat(wd[m.key]) >= m.targets[weekIndex])
+    }));
+
+    const targetsHit = METRICS.filter(m => {
+        const val = wd[m.key];
+        if (val === undefined) return false;
+        if (m.lowerBetter) return parseFloat(val) <= m.targets[weekIndex];
+        return parseFloat(val) >= m.targets[weekIndex];
+    }).length;
+
+    return {
+        week: weekIndex + 1,
+        weekDate: WEEK_DATES[weekIndex],
+        metrics: metricsPayload,
+        newAchievements: (newAchievements || []).map(a => ({ name: a.name, desc: a.desc })),
+        summary: {
+            demoMeetings: wd.demo_meetings || 0,
+            demoTarget: METRICS.find(m => m.key === 'demo_meetings').targets[weekIndex],
+            totalFollowers: wd.total_followers || '—',
+            followersTarget: METRICS.find(m => m.key === 'total_followers').targets[weekIndex],
+            uniqueVisitors: wd.unique_visitors || '—',
+            visitorsTarget: METRICS.find(m => m.key === 'unique_visitors').targets[weekIndex],
+            targetsHit: targetsHit,
+            totalTargets: METRICS.length
+        },
+        dashboardUrl: settings.dashboardUrl || 'https://iridescent-technologies.github.io/Marketing/'
+    };
+}
+
+async function sendGoogleChatNotification(weekIndex, newAchievements) {
+    const settings = loadSettings();
+    if (!settings.notifyEnabled || !settings.webhookUrl) return;
+
+    try {
+        const payload = buildNotificationPayload(weekIndex, newAchievements);
+        const response = await fetch(settings.webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(payload),
+            mode: 'no-cors'
+        });
+        // no-cors means we can't read the response, but the request goes through
+    } catch (err) {
+        console.warn('Google Chat notification failed:', err);
+    }
+}
+
+async function testNotification() {
+    const settings = loadSettings();
+    if (!settings.webhookUrl) {
+        showToast('No Webhook URL', 'Please enter your Google Apps Script URL first');
+        return;
+    }
+
+    try {
+        const payload = {
+            week: 1,
+            weekDate: '30 Mar',
+            metrics: [
+                { label: 'Demo Meetings Booked', actual: 1, target: 0, hitTarget: true },
+                { label: 'LinkedIn Followers', actual: 320, target: 315, hitTarget: true },
+                { label: 'Website Visitors', actual: 55, target: 60, hitTarget: false },
+            ],
+            newAchievements: [{ name: 'Test Achievement', desc: 'This is a test notification' }],
+            summary: {
+                demoMeetings: 1, demoTarget: 0,
+                totalFollowers: 320, followersTarget: 315,
+                uniqueVisitors: 55, visitorsTarget: 60,
+                targetsHit: 2, totalTargets: 3
+            },
+            dashboardUrl: settings.dashboardUrl || 'https://iridescent-technologies.github.io/Marketing/'
+        };
+
+        await fetch(settings.webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(payload),
+            mode: 'no-cors'
+        });
+
+        showToast('Test Sent', 'Check your Google Chat space for the notification');
+    } catch (err) {
+        showToast('Test Failed', 'Could not reach the webhook URL');
+    }
+}
+
+/* ============================================================
+   BOOKED MEETINGS
+   ============================================================ */
+const MEETINGS_KEY = 'zavmo_tracker_meetings';
+
+function loadMeetings() {
+    try {
+        const raw = localStorage.getItem(MEETINGS_KEY);
+        if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return [];
+}
+
+function saveMeetings(meetings) {
+    localStorage.setItem(MEETINGS_KEY, JSON.stringify(meetings));
+}
+
+let meetingsData = loadMeetings();
+
+function addMeeting(prefill) {
+    const meeting = prefill || {
+        id: Date.now(),
+        date: new Date().toISOString().split('T')[0],
+        company: '',
+        contact: '',
+        bookedBy: '',
+        status: 'scheduled',
+        source: 'manual'
+    };
+    if (!meeting.id) meeting.id = Date.now() + Math.random();
+    meetingsData.push(meeting);
+    saveMeetings(meetingsData);
+    renderMeetings();
+}
+
+function removeMeeting(id) {
+    meetingsData = meetingsData.filter(m => m.id !== id);
+    saveMeetings(meetingsData);
+    renderMeetings();
+}
+
+function updateMeeting(id, field, value) {
+    const m = meetingsData.find(x => x.id === id);
+    if (m) { m[field] = value; saveMeetings(meetingsData); }
+    renderMeetingsSummary();
+}
+
+function renderMeetings() {
+    const list = document.getElementById('meetings-list');
+    if (meetingsData.length === 0) {
+        list.innerHTML = '<p style="padding:var(--space-lg);color:var(--text-tertiary);text-align:center;">No meetings logged yet. Click "Add Meeting" to get started, or pull from Google Calendar.</p>';
+    } else {
+        const sorted = [...meetingsData].sort((a,b) => new Date(b.date) - new Date(a.date));
+        list.innerHTML = sorted.map(m => `
+        <div class="meeting-entry">
+            <input type="date" value="${m.date}" onchange="updateMeeting(${m.id},'date',this.value)" aria-label="Meeting date">
+            <input type="text" value="${m.company||''}" placeholder="Company name" onchange="updateMeeting(${m.id},'company',this.value)" aria-label="Company">
+            <input type="text" value="${m.contact||''}" placeholder="Contact name" onchange="updateMeeting(${m.id},'contact',this.value)" aria-label="Contact">
+            <input type="text" value="${m.bookedBy||''}" placeholder="Booked by" onchange="updateMeeting(${m.id},'bookedBy',this.value)" aria-label="Booked by">
+            <select onchange="updateMeeting(${m.id},'status',this.value)" aria-label="Status">
+                <option value="scheduled" ${m.status==='scheduled'?'selected':''}>Scheduled</option>
+                <option value="completed" ${m.status==='completed'?'selected':''}>Completed</option>
+                <option value="cancelled" ${m.status==='cancelled'?'selected':''}>Cancelled</option>
+                <option value="no-show" ${m.status==='no-show'?'selected':''}>No-show</option>
+                <option value="rescheduled" ${m.status==='rescheduled'?'selected':''}>Rescheduled</option>
+            </select>
+            <button class="btn-icon" onclick="removeMeeting(${m.id})" aria-label="Remove meeting" title="Remove">&times;</button>
+        </div>`).join('');
+    }
+    renderMeetingsSummary();
+
+    // Show calendar fetch bar if connected
+    const settings = loadSettings();
+    const calBar = document.getElementById('cal-fetch-bar');
+    if (calBar) calBar.style.display = (settings.webhookUrl && settings.calEnabled) ? 'flex' : 'none';
+}
+
+function renderMeetingsSummary() {
+    const el = document.getElementById('meetings-summary');
+    const total = meetingsData.length;
+    const scheduled = meetingsData.filter(m => m.status === 'scheduled').length;
+    const completed = meetingsData.filter(m => m.status === 'completed').length;
+    const cancelled = meetingsData.filter(m => m.status === 'cancelled' || m.status === 'no-show').length;
+
+    el.innerHTML = [
+        { label: 'Total Meetings', value: total },
+        { label: 'Scheduled', value: scheduled },
+        { label: 'Completed', value: completed },
+        { label: 'Cancelled / No-show', value: cancelled },
+    ].map(s => `
+    <div class="glass-card meetings-stat">
+        <div class="stat-value">${s.value}</div>
+        <div class="stat-label">${s.label}</div>
+    </div>`).join('');
+}
+
+function exportMeetingsCSV() {
+    let csv = 'Date,Company,Contact,Booked By,Status,Source\n';
+    meetingsData.forEach(m => {
+        csv += `"${m.date}","${m.company||''}","${m.contact||''}","${m.bookedBy||''}","${m.status}","${m.source||'manual'}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'zavmo_booked_meetings.csv';
+    a.click();
+}
+
+/* ============================================================
+   GA4 API FETCH
+   ============================================================ */
+async function fetchGA4Data() {
+    const settings = loadSettings();
+    if (!settings.webhookUrl) {
+        showToast('Not Configured', 'Please set up your Google Apps Script URL in Settings first');
+        return;
+    }
+    if (!settings.ga4Property) {
+        showToast('No GA4 Property', 'Please enter your GA4 Property ID in Settings');
+        return;
+    }
+
+    const statusEl = document.getElementById('ga4-fetch-status') || document.getElementById('ga4-entry-status');
+    if (statusEl) statusEl.innerHTML = '<span class="fetch-spinner"></span> Fetching GA4 data...';
+
+    try {
+        // Calculate the date range for the selected week
+        const weekStart = new Date(2026, 2, 30); // 30 Mar 2026
+        weekStart.setDate(weekStart.getDate() + currentWeek * 7);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 6);
+
+        const payload = {
+            action: 'fetchGA4',
+            ga4Property: settings.ga4Property,
+            startDate: weekStart.toISOString().split('T')[0],
+            endDate: weekEnd.toISOString().split('T')[0]
+        };
+
+        const response = await fetch(settings.webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'success' && data.ga4) {
+            // Auto-fill the GA4 metrics
+            const ga4Map = {
+                unique_visitors: data.ga4.activeUsers,
+                page_views: data.ga4.screenPageViews,
+                avg_session_duration: data.ga4.avgSessionDuration,
+                pages_per_session: data.ga4.screenPageViewsPerSession,
+                bounce_rate: data.ga4.bounceRate
+            };
+
+            Object.entries(ga4Map).forEach(([key, val]) => {
+                if (val !== undefined && val !== null) {
+                    weeklyData[currentWeek][key] = parseFloat(val);
+                    const input = document.getElementById('input-' + key);
+                    if (input) input.value = parseFloat(val);
+                }
+            });
+
+            saveData(weeklyData);
+            renderKPIs();
+            if (statusEl) statusEl.innerHTML = '<span style="color:var(--success)">GA4 data loaded</span>';
+            showToast('GA4 Data Loaded', `Website metrics for Week ${currentWeek+1} auto-filled`);
+        } else {
+            if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger)">${data.message || 'Failed to fetch'}</span>`;
+        }
+    } catch (err) {
+        if (statusEl) statusEl.innerHTML = '<span style="color:var(--danger)">Connection failed</span>';
+        console.warn('GA4 fetch error:', err);
+    }
+}
+
+/* ============================================================
+   GOOGLE CALENDAR FETCH
+   ============================================================ */
+async function fetchCalendarMeetings() {
+    const settings = loadSettings();
+    if (!settings.webhookUrl) {
+        showToast('Not Configured', 'Please set up your Google Apps Script URL in Settings first');
+        return;
+    }
+
+    const statusEl = document.getElementById('cal-fetch-status');
+    if (statusEl) statusEl.innerHTML = '<span class="fetch-spinner"></span> Pulling meetings...';
+
+    try {
+        const payload = {
+            action: 'fetchCalendar',
+            searchTerms: settings.calSearch || 'demo, zavmo, discovery',
+            startDate: '2026-03-30',
+            endDate: '2026-06-22'
+        };
+
+        const response = await fetch(settings.webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'success' && data.meetings) {
+            let added = 0;
+            data.meetings.forEach(m => {
+                // Don't add duplicates (match on date + company)
+                const exists = meetingsData.some(existing =>
+                    existing.date === m.date && existing.company === m.company
+                );
+                if (!exists) {
+                    addMeeting({
+                        id: Date.now() + Math.random(),
+                        date: m.date,
+                        company: m.company || m.title || '',
+                        contact: m.contact || '',
+                        bookedBy: m.organiser || '',
+                        status: m.status || 'scheduled',
+                        source: 'google-calendar'
+                    });
+                    added++;
+                }
+            });
+            if (statusEl) statusEl.innerHTML = `<span style="color:var(--success)">${added} new meetings added</span>`;
+            showToast('Calendar Synced', `${added} meetings pulled from Google Calendar`);
+        } else {
+            if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger)">${data.message || 'No meetings found'}</span>`;
+        }
+    } catch (err) {
+        if (statusEl) statusEl.innerHTML = '<span style="color:var(--danger)">Connection failed</span>';
+        console.warn('Calendar fetch error:', err);
+    }
+}
+
+// Initial render
+renderAll();
+renderSettings();
+renderMeetings();
+</script>
+</body>
+</html>
